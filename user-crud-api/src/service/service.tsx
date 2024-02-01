@@ -160,6 +160,7 @@ export default class Service {
         api_url = `${api_url}/${params}`;
       }
       try {
+        console.log(body.get('profile'))
         const response = await axios.post(api_url, body, options);
         return response;
       } catch (error:any) {

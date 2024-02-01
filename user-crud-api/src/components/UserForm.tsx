@@ -1,14 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {useParams, useNavigate} from "react-router-dom";
 import Service from "../service/service.tsx";
+import axios from "axios";
 
 const UserForm: React.FC = ({method}) => {
+    console.log(method);
     const textDisplay = method === 'POST' ? 'Add' : 'Update';
     const [data, setData] = useState({
         name: '',
         email: '',
         password: '',
         age: '0',
+        profile: '',
+        resume: ''
     });
     const {id} = useParams();
     const navigate = useNavigate();
@@ -38,8 +42,14 @@ const UserForm: React.FC = ({method}) => {
 
     const handleChange = (event) =>{
             const {name, value} = event.target;
-            console.log(name)
+
             setData(prevData => ({...prevData,[name]:value}))
+    }
+
+    const handleFile = (event) => {
+        const { name }= event.target;
+        const file = event.target.files[0];
+        setData(prevData => ({...prevData,[name]:file}))
     }
 
 
@@ -49,14 +59,12 @@ const UserForm: React.FC = ({method}) => {
 
     const handleAddUser = async () => {
         let Age = parseInt(data.age);
-
         const newUser = {
             "name": data.name,
             "email": data.email,
             "password": data.password,
             "age": Age
         }
-        console.log(Age)
 
         if(data.name === '' || data.name.length < 3 || data.name.length > 30) {
             alert('Name must be at least 3 characters and at most 30 characters');
@@ -67,14 +75,30 @@ const UserForm: React.FC = ({method}) => {
             alert('Age must be at least 1 and at most 100');
             return null;
         }
+
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+        formData.append('password', data.password);
+        formData.append('age', Age);
+        formData.append('profile', data.profile);
+        formData.append('resume', data.resume);
         const method_name = method === 'POST' ? Service.postMethod : Service.putMethod;
+        // fetch('http://localhost:3001/user', {
+        //     method: 'POST',
+        //     body: formData,
+        // })
+        // return null;
+        // const res = await axios.post('http://localhost:3001/user', formData)
+
         try{
             const response = await Service.makeAPICall({
-                methodName: method_name,
+                methodName: Service.postMethod,
                 api_url: Service.user,
-                params: [id],
-                body: newUser
+                // params: [id],
+                body: formData
             })
+            console.log(response)
         }catch (error){
             console.log(error)
         }
@@ -112,6 +136,18 @@ const UserForm: React.FC = ({method}) => {
             <input type="number" value={data.age} min={1} max={100} name="age" className="form-control"
                    onChange={(event) => handleChange(event)} id="age"
                    placeholder="Age" required/>
+        </div>
+        <div className="form-group">
+            <label htmlFor="profile">Profile Picture</label>
+            <input type="file"  name="profile" className="form-control"
+                   onChange={(event) => handleFile(event)} id="profile"
+                   placeholder="Upload your profile" required/>
+        </div>
+        <div className="form-group">
+            <label htmlFor="resume">Resume</label>
+            <input type="file" name="resume" className="form-control"
+                   onChange={(event) => handleFile(event)} id="resume"
+                   placeholder="Upload your resume" required/>
         </div>
 
     </form>
