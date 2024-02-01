@@ -4,4 +4,6 @@ export declare class User {
     email: string;
     age: number;
     password: string;
+    resume: string;
+    profile: string;
 }

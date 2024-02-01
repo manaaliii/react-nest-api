@@ -1,4 +1,4 @@
-import {IsString, IsEmail, Matches, IsNumber} from "class-validator";
+import {IsString, IsEmail, Matches, IsNumber, IsObject} from "class-validator";
 
 export class CreateUserDto {
     @IsString()
@@ -8,11 +8,20 @@ export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @IsNumber()
-    age: number;
+    // @IsNumber()
+    // @IsString()
+    // age: number;
 
     @IsString()
     password: string;
+
+
+    @IsObject()
+    profile: object;
+
+
+    @IsObject()
+    resume: object;
 
     // @IsString()
     // @Matches(/^[a-zA-Z]+$/, { message: 'Designation should contain only alphabets' })

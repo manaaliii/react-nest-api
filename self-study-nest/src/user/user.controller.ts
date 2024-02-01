@@ -1,7 +1,20 @@
-import {Controller, Delete, Get, Post, Put, Param, ParseIntPipe, Body} from '@nestjs/common';
+import {
+    Controller,
+    Delete,
+    Get,
+    Post,
+    Req,
+    Put,
+    Param,
+    UseInterceptors,
+    ParseIntPipe,
+    Body,
+    UploadedFiles
+} from '@nestjs/common';
 import {UserService} from "./user.service";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiParam, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 
@@ -13,7 +26,7 @@ export class UserController {
     }
 
     @Get('/')
-    @ApiOperation({summary: 'Get all the ussers'})
+    @ApiOperation({summary: 'Get all the users'})
     @ApiResponse({
         status: 200,    
         description: 'All data list'
@@ -28,6 +41,10 @@ export class UserController {
 
     
     @Post()
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'profile', maxCount: 1 },
+        { name: 'resume', maxCount: 1 },
+    ]))
     @ApiOperation({summary: 'create new record'})
     @ApiBody({
         schema:{
@@ -64,9 +81,12 @@ export class UserController {
         status: 403,
         description: 'Forbidden'
     })
-    addUser(@Body() createUserDto: CreateUserDto){
-        return this.userService.create(createUserDto)
-    }
+        addUser(@UploadedFiles() files:any, @Body() createUserDto: unknown){
+            console.log(files)
+        console.log(createUserDto)
+            return {message: 'message'}
+            // return this.userService.create(createUserDto, profile, resume)
+        }
 
     @Put('/:userId')
     @ApiOperation({summary: 'update record'})
@@ -104,7 +124,7 @@ export class UserController {
     })
     @ApiResponse({
         status: 403,
-        description: 'Forbidder'
+        description: 'Forbidden'
     })
     getUserById(@Param('userId', ParseIntPipe) userId:number){
         return this.userService.getOne(userId);

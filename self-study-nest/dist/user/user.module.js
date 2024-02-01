@@ -12,13 +12,36 @@ const user_controller_1 = require("./user.controller");
 const user_service_1 = require("./user.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entity/user.entity");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         controllers: [user_controller_1.UserController],
-        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]), platform_express_1.MulterModule.register({
+                limits: {
+                    fileSize: 1024 * 1024 * 5,
+                },
+                storage: (0, multer_1.diskStorage)({
+                    destination: (req, file, cb) => {
+                        let uploadPath = './uploads';
+                        if (file.mimetype.toLowerCase() === 'application/pdf') {
+                            uploadPath = './uploads/resumes';
+                        }
+                        else if (file.mimetype.startsWith('image/')) {
+                            uploadPath = './uploads/images';
+                        }
+                        cb(null, uploadPath);
+                    },
+                    filename: (req, file, cb) => {
+                        cb(null, file.originalname);
+                    },
+                }),
+            })
+        ],
         providers: [user_service_1.UserService],
         exports: [user_service_1.UserService]
     })

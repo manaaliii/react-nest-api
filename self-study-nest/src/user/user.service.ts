@@ -22,9 +22,9 @@ export class UserService {
         return this.userRepository.findOne({where: {id}});
     }
 
-    async create(createUserDto: CreateUserDto){
-        return this.userRepository.save(createUserDto);
-    }
+    // async create(createUserDto: CreateUserDto){
+    //     return this.userRepository.save(createUserDto);
+    // }
 
     async update(userId: number, updateUserDto:UpdateUserDto){
         return this.userRepository.update(userId, updateUserDto)

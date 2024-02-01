@@ -16,4 +16,10 @@ export class User {
 
     @Column()
     password: string;
+
+    @Column()
+    resume: string;
+
+    @Column()
+    profile: string;
 }

@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
-const create_user_dto_1 = require("./dto/create-user.dto");
 const update_user_dto_1 = require("./dto/update-user.dto");
+const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
 let UserController = class UserController {
     constructor(userService) {
@@ -25,8 +25,10 @@ let UserController = class UserController {
     getUsers() {
         return this.userService.getAll();
     }
-    addUser(createUserDto) {
-        return this.userService.create(createUserDto);
+    addUser(files, createUserDto) {
+        console.log(files);
+        console.log(createUserDto);
+        return { message: 'message' };
     }
     updateUser(userId, updateUserDto) {
         console.log(updateUserDto);
@@ -42,7 +44,7 @@ let UserController = class UserController {
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)('/'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all the ussers' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all the users' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'All data list'
@@ -57,6 +59,10 @@ __decorate([
 ], UserController.prototype, "getUsers", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'profile', maxCount: 1 },
+        { name: 'resume', maxCount: 1 },
+    ])),
     (0, swagger_1.ApiOperation)({ summary: 'create new record' }),
     (0, swagger_1.ApiBody)({
         schema: {
@@ -93,9 +99,10 @@ __decorate([
         status: 403,
         description: 'Forbidden'
     }),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.UploadedFiles)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "addUser", null);
 __decorate([
@@ -137,7 +144,7 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({
         status: 403,
-        description: 'Forbidder'
+        description: 'Forbidden'
     }),
     __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
